@@ -1,10 +1,7 @@
 package org.fornever.java;
 
 import org.fornever.java.exceptions.MethodExecutionException;
-import org.fornever.java.test.Human;
-import org.fornever.java.test.IHuman;
-import org.fornever.java.test.IPublicPeople;
-import org.fornever.java.test.People;
+import org.fornever.java.test.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +21,13 @@ class BrokenTest {
         Object rt = broken.call(people, "setName", "test2");
         Assertions.assertNull(rt);
         Assertions.assertEquals("test2", people.getName());
+    }
+
+    @Test
+    void testCallWithOverride() {
+        var people = new AnotherPeople("sun");
+        Assertions.assertEquals("another sun", people.getName());
+        Assertions.assertEquals("another sun", broken.call(people, "getName"));
     }
 
     @Test

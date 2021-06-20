@@ -30,8 +30,10 @@ class BrokenReflectUtil {
 
     protected Set<Method> getMethodsSafe(Class clazz, String methodName) {
         var methods = new HashSet<Method>();
-        methods.addAll(Arrays.asList(clazz.getMethods()));
-        methods.addAll(Arrays.asList(clazz.getDeclaredMethods()));
+        var declaredMethods = Arrays.asList(clazz.getDeclaredMethods());
+        var allMethods = Arrays.asList(clazz.getMethods());
+        methods.addAll(declaredMethods);
+        methods.addAll(allMethods);
         return methods.stream().filter(method -> method.getName().equals(methodName)).collect(Collectors.toSet());
     }
 
