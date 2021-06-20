@@ -44,7 +44,7 @@ public class BrokenObjectMap implements Map<String, Object> {
         return this.fieldsMap.values().stream().anyMatch(field -> {
             try {
                 var fieldValue = field.get(object);
-                if (fieldValue == null && fieldValue == null) {
+                if (fieldValue == null && value == null) {
                     return true;
                 }
                 if (fieldValue != null) {
