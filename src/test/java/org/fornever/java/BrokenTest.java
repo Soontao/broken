@@ -1,9 +1,14 @@
 package org.fornever.java;
 
+import org.fornever.java.exceptions.MethodExecutionException;
+import org.fornever.java.test.Human;
+import org.fornever.java.test.IHuman;
 import org.fornever.java.test.IPublicPeople;
 import org.fornever.java.test.People;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.Set;
 
 
 class BrokenTest {
@@ -17,6 +22,23 @@ class BrokenTest {
         Object rt = broken.call(people, "setName", "test2");
         Assertions.assertNull(rt);
         Assertions.assertEquals("test2", people.getName());
+    }
+
+    @Test
+    void testCall_WhenThrowException() {
+        var human = new Human();
+        Assertions.assertThrows(MethodExecutionException.class, () -> {
+            broken.call(human, "someOp");
+        });
+    }
+
+    @Test
+    void testProxy_WhenThrowException() {
+        var human = broken.proxy(IHuman.class, new Human());
+
+        Assertions.assertThrows(MethodExecutionException.class, () -> {
+            broken.call(human, "someOp");
+        });
     }
 
     @Test
@@ -46,6 +68,9 @@ class BrokenTest {
         var peopleMap = Broken.defaultBroken.toMap(people);
         peopleMap.put("name", "test8");
         Assertions.assertEquals("test8", people.getName());
+        Assertions.assertEquals("test8", peopleMap.get("name"));
+        Assertions.assertEquals(1, peopleMap.size());
+        Assertions.assertEquals(Set.of("name"), peopleMap.keySet());
     }
 
 }

@@ -1,10 +1,12 @@
 package org.fornever.java;
 
 import org.fornever.java.exceptions.FieldNotFoundException;
+import org.fornever.java.exceptions.MethodExecutionException;
 import org.fornever.java.exceptions.MethodNotFoundException;
 import org.fornever.java.exceptions.ValueNotAssignException;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
@@ -68,10 +70,23 @@ public class Broken {
      */
     public <T> T proxy(Class<T> iInterface, Object object) {
         return (T) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{iInterface}, (proxy, method, args) -> {
-            return this.call(object, method.getName(), args);
+            try {
+                return this.call(object, method.getName(), args);
+            } catch (MethodExecutionException e) {
+                // throw the original exception
+                throw e.getInnerException();
+            }
         });
     }
 
+    /**
+     * @param object
+     * @param methodName
+     * @param params
+     * @return
+     * @throws MethodExecutionException when method throw the exception, the exception will be carried in the un-checked exception
+     * @throws MethodNotFoundException  when method not found
+     */
     public Object call(Object object, String methodName, Object... params) {
         if (object == null) {
             throw new NullPointerException("provided object is null");
@@ -86,6 +101,8 @@ public class Broken {
                 method.setAccessible(true);
                 try {
                     return method.invoke(object, params);
+                } catch (InvocationTargetException e) {
+                    throw new MethodExecutionException(e);
                 } catch (Throwable e) {
                     throw new RuntimeException(e);
                 }
