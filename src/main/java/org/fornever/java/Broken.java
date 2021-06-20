@@ -39,13 +39,12 @@ public class Broken {
 
         var fieldType = field.getType();
         try {
+            field.setAccessible(true);
             if (value == null) {
-                field.setAccessible(true);
                 field.set(object, null);
             } else {
                 var valueType = value.getClass();
                 if (fieldType.isAssignableFrom(valueType)) {
-                    field.setAccessible(true);
                     field.set(object, value);
                 } else {
                     throw new ValueNotAssignException(String.format("field '%s' with class '%s' can not be assign with instance which class '%s'", fieldName, fieldType.getName(), valueType.getName()));
