@@ -12,9 +12,16 @@ import java.util.Map;
 
 public class Broken {
 
-    protected static Broken defaultBroken = new Broken();
+    private static Broken defaultBroken = new Broken();
 
     private BrokenReflectUtil util = new BrokenReflectUtil();
+
+    public synchronized static Broken getDefaultBroken() {
+        if (defaultBroken == null) {
+            defaultBroken = new Broken();
+        }
+        return defaultBroken;
+    }
 
 
     public void setValue(Object object, String fieldName, Object value) {

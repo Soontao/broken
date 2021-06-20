@@ -71,7 +71,7 @@ class BrokenTest {
     void testToMap() {
         var people = new People("test7");
         Assertions.assertEquals("test7", people.getName());
-        var peopleMap = Broken.defaultBroken.toMap(people);
+        var peopleMap = Broken.getDefaultBroken().toMap(people);
         peopleMap.put("name", "test8");
         Assertions.assertEquals("test8", people.getName());
         Assertions.assertEquals("test8", peopleMap.get("name"));
