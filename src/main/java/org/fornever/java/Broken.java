@@ -75,6 +75,7 @@ public class Broken {
      * @return
      */
     public <T> T proxy(Class<T> iInterface, Object object) {
+        // TODO some validations here
         return (T) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{iInterface}, (proxy, method, args) -> {
             try {
                 return this.call(object, method.getName(), args);
