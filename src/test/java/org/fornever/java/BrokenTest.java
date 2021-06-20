@@ -8,6 +8,8 @@ import org.fornever.java.test.People;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -71,6 +73,22 @@ class BrokenTest {
         Assertions.assertEquals("test8", peopleMap.get("name"));
         Assertions.assertEquals(1, peopleMap.size());
         Assertions.assertEquals(Set.of("name"), peopleMap.keySet());
+        Assertions.assertTrue(peopleMap.containsKey("name"));
+        Assertions.assertFalse(peopleMap.containsKey("name1"));
+        Assertions.assertTrue(peopleMap.containsValue("test8"));
+        Assertions.assertFalse(peopleMap.containsValue("test7"));
+        peopleMap.remove("name");
+        Assertions.assertNull(people.getName());
+        Map<String, Object> t1 = new HashMap<>();
+        t1.put("name", "test9");
+        t1.put("name2", "not existed");
+        peopleMap.putAll(t1);
+
+        Assertions.assertEquals("test9", people.getName());
+        Assertions.assertNull(peopleMap.get("name2"));
+        peopleMap.clear();
+        Assertions.assertNull(people.getName());
+
     }
 
 }

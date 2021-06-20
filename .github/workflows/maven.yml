@@ -42,10 +42,10 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
 
-      - name: Upload coverage
-        uses: codecov/codecov-action@v1
-
       - name: Publish to GitHub Packages
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: mvn deploy
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
