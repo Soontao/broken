@@ -1,5 +1,13 @@
 package org.fornever.java;
 
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.modifier.ModifierContributor;
+import net.bytebuddy.description.modifier.Visibility;
+import net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy;
+import net.bytebuddy.implementation.InvocationHandlerAdapter;
+import net.bytebuddy.implementation.MethodCall;
+import net.bytebuddy.implementation.SuperMethodCall;
+import net.bytebuddy.matcher.ElementMatchers;
 import org.fornever.java.exceptions.FieldNotFoundException;
 import org.fornever.java.exceptions.MethodExecutionException;
 import org.fornever.java.exceptions.MethodNotFoundException;
@@ -8,6 +16,9 @@ import org.fornever.java.exceptions.ValueNotAssignException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class Broken {
@@ -69,21 +80,40 @@ public class Broken {
     /**
      * create a proxy with an given interface
      *
-     * @param iInterface
+     * @param aType
      * @param object
      * @param <T>
      * @return
+     * @throws org.fornever.java.exceptions.NotImplementException the object is not implemented the interface
      */
-    public <T> T proxy(Class<T> iInterface, Object object) {
-        // TODO some validations here
-        return (T) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{iInterface}, (proxy, method, args) -> {
+    public <T> T proxy(Class<T> aType, Object object) {
+        if (!aType.isInterface()) {
             try {
-                return this.call(object, method.getName(), args);
-            } catch (MethodExecutionException e) {
-                // throw the original exception
-                throw e.getInnerException();
+                aType.getConstructor();
+            } catch (NoSuchMethodException e) {
+                throw new MethodNotFoundException(String.format("class '%s' must have an empty constructor", aType.getName()));
             }
-        });
+        }
+        this.util.validateObjectImplInterface(object, aType);
+        try {
+            var newType = new ByteBuddy()
+                    .subclass(aType)
+                    .method(ElementMatchers.any())
+                    .intercept(InvocationHandlerAdapter.of((proxy, method, args) -> {
+                        try {
+                            return this.call(object, method.getName(), args);
+                        } catch (MethodExecutionException e) {
+                            // throw the original exception
+                            throw e.getInnerException();
+                        }
+                    }))
+                    .make()
+                    .load(aType.getClassLoader())
+                    .getLoaded();
+            return newType.getConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
